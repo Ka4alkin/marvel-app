@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import {Component} from 'react';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import Spinner from "../spinner/Spinner";
 import MarvelService from '../../services/MarvelService';
@@ -10,7 +10,7 @@ import mjolnir from '../../resources/img/mjolnir.png';
 class RandomChar extends Component {
     constructor(props) {
         super(props);
-        this.updateChar();
+        console.log('Constructor')
     }
 
     state = {
@@ -20,6 +20,16 @@ class RandomChar extends Component {
     }
 
     marvelService = new MarvelService();
+
+    componentDidMount() {
+        console.log('Mount')
+        this.timerId = setInterval(this.updateChar, 3000)
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.timerId)
+        console.log('unMount')
+    }
 
     onCharLoaded = (char) => {
         this.setState({
@@ -34,8 +44,12 @@ class RandomChar extends Component {
             error: true
         })
     }
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        console.log('update')
+    }
 
     updateChar = () => {
+        console.log('updateChar')
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
         this.marvelService
             .getCharacter(id)
@@ -44,6 +58,7 @@ class RandomChar extends Component {
     }
 
     render() {
+        console.log('render')
         const {char, loading, error} = this.state;
         const errorMessage = error ? <ErrorMessage/> : null;
         const spinner = loading ? <Spinner/> : null;
