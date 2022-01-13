@@ -8,11 +8,6 @@ import mjolnir from '../../resources/img/mjolnir.png';
 
 
 class RandomChar extends Component {
-    constructor(props) {
-        super(props);
-        console.log('Constructor')
-    }
-
     state = {
         char: {},
         loading: true,
@@ -22,14 +17,9 @@ class RandomChar extends Component {
     marvelService = new MarvelService();
 
     componentDidMount() {
-        console.log('Mount')
-        this.timerId = setInterval(this.updateChar, 3000)
+        this.updateChar()
     }
 
-    componentWillUnmount() {
-        clearInterval(this.timerId)
-        console.log('unMount')
-    }
 
     onCharLoaded = (char) => {
         this.setState({
@@ -39,18 +29,28 @@ class RandomChar extends Component {
     }
 
     onError = () => {
+        console.log('on error')
         this.setState({
             loading: false,
             error: true
         })
     }
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        console.log('update')
+
+    onCharLoading = () => {
+        this.setState({
+            loading: true
+        })
     }
 
+
     updateChar = () => {
-        console.log('updateChar')
+        if (this.state.error) {
+            this.setState({
+                error: false
+            })
+        }
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
+        this.onCharLoading();
         this.marvelService
             .getCharacter(id)
             .then(this.onCharLoaded)
@@ -58,7 +58,6 @@ class RandomChar extends Component {
     }
 
     render() {
-        console.log('render')
         const {char, loading, error} = this.state;
         const errorMessage = error ? <ErrorMessage/> : null;
         const spinner = loading ? <Spinner/> : null;
@@ -78,7 +77,7 @@ class RandomChar extends Component {
                         Or choose another one
                     </p>
                     <button className="button button__main">
-                        <div className="inner">try it</div>
+                        <div onClick={this.updateChar} className="inner">try it</div>
                     </button>
                     <img src={mjolnir} alt="mjolnir" className="randomchar__decoration"/>
                 </div>
@@ -92,7 +91,8 @@ const View = ({char}) => {
 
     return (
         <div className="randomchar__block">
-            <img src={thumbnail} alt="Random character" className="randomchar__img"/>
+            <img style={{objectFit: thumbnail.includes('image_not_available') ? 'contain' : 'cover'}} src={thumbnail}
+                 alt="Random character" className="randomchar__img"/>
             <div className="randomchar__info">
                 <p className="randomchar__name">{name}</p>
                 <p className="randomchar__descr">
