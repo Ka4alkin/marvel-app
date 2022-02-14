@@ -7,7 +7,7 @@ import PropTypes from "prop-types";
 
 class CharList extends Component {
 
-
+    //test
     state = {
         charList: [],
         loading: true,
